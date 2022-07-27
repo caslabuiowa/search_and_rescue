@@ -2,10 +2,14 @@
 # -*- coding: utf-8 -*-
 """
 Created on Tue Jul 26 15:50:51 2022
-
 @author: Camilla Tabasso
 """
 import numpy as np
+
+from scipy.optimize import Bounds, minimize
+from optimization.AngularRate import angularRate
+from optimization.Speed import speed
+from polynomial.bernstein import Bernstein
 
 # Initialize parameters class
 class Parameters:
@@ -14,7 +18,54 @@ class Parameters:
         self.initial_position = np.array([0, 0], ndmin=2)
         self.target_position = np.array([50, 50], ndmin=2)
         self.estimate = np.array([0, 0], ndmin=2)
+        self.N = 5
+        self.n_dim = 2
+        self.v_max = 1
+        self.omega_max = 0.25
+        
+def initGuess(init_pos, final_pos, params):
+    
+    x0 = []
+    T = 30
+    x0.append(np.linspace(init_pos[0,0], final_pos[0,0], params.N-1)[1:-1])
+    x0.append(np.linspace(init_pos[0,1], final_pos[0,1], params.N-1)[1:-1])
+    
+    return np.concatenate([*x0, [T]])
+    
+        
+def cost(x, params):
+    T = x(-1)
+    
+def nonlcon(x, params):
+    x = []
+    
+
+def generateTrajectory(init_pos, final_pos, init_vel, params):
+    
+    x0 = initGuess(init_pos, final_pos, params)
+    # cons = [{'type': 'ineq',
+    #          'fun': lambda x: nonlcon(x, params)}]
+    
+    # # Compute the trajectory
+    # traj = minimize(cost, x0,
+    #                    constraints=cons,
+    #                    bounds=bounds,
+    #                    method='SLSQP',
+    #                    options={'maxiter': 250,
+    #                             'disp': True,
+    #                             'iprint': 1})
+    
+    return traj
+        
 
 if __name__ == '__main__':
+    
+    initial_position = np.array([0, 0], ndmin=2)
+    final_position = np.array([50, 50], ndmin=2)
+    initial_velocity = np.array([0, 0], ndmin=2)
     params = Parameters()
+    traj = generateTrajectory(initial_position, final_position, initial_velocity, params)
+    
+    
+    
      
