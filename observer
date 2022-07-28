@@ -1,0 +1,46 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Jul 27 20:43:16 2022
+
+@author: camillatabasso
+"""
+
+import numpy as np
+from scipy.optimize import minimize
+from polynomial.bernstein import Bernstein
+
+def obsFun(x, range_meas, pos, n):
+    
+    J = 0
+    
+    for i in n:
+        dist = np.linalg.norm(x - pos[i,:])
+        J = J + np.linalg.norm(dist - range_meas[i])
+    
+    return J
+
+def observer(x0, range_meas, pos, n):
+    
+    obs_data = minimize(obsFun, x0, method='Newton-CG',
+               options={'xatol': 1e-8, 'disp': True})
+    
+    return obs_data
+
+if __name__ == '__main__':
+    
+    n = 7
+    tf = 43.3
+    t0 = 0
+    x0 = np.array([0, 0], ndmin=2)
+    x_star = np.array([20, 20], ndmin=2)
+    xcp = np.array([-15, -15, -6.77, -1.15, -1.19, -0.39, 0])
+    ycp = np.array([-25, -25, -27.69, -21.61, -14.38, -7.20, 0])
+    traj = Bernstein(np.append(xcp, ycp), t0, tf)
+    
+    for i in n:
+        range_meas = np.linalg.norm(traj.cpts[i] - x_star)
+        
+    x_est = observer(x0, range_meas, traj.cpts, n)
+    
+    
