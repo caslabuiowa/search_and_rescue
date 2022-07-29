@@ -14,15 +14,17 @@ def obsFun(x, range_meas, pos, n):
     
     J = 0
     
-    for i in n:
-        dist = np.linalg.norm(x - pos[i,:])
+    for i in range(n):
+        dist = np.linalg.norm(x - pos[:,i])
         J = J + np.linalg.norm(dist - range_meas[i])
     
     return J
 
 def observer(x0, range_meas, pos, n):
     
-    obs_data = minimize(obsFun, x0, method='Newton-CG',
+    # Perform the optimization
+    def fn(x): return obsFun(x, range_meas, pos, n)
+    obs_data = minimize(fn, x0, method='nelder-mead',
                options={'xatol': 1e-8, 'disp': True})
     
     return obs_data
@@ -30,17 +32,19 @@ def observer(x0, range_meas, pos, n):
 if __name__ == '__main__':
     
     n = 7
+    dim = 2
     tf = 43.3
     t0 = 0
     x0 = np.array([0, 0], ndmin=2)
     x_star = np.array([20, 20], ndmin=2)
     xcp = np.array([-15, -15, -6.77, -1.15, -1.19, -0.39, 0])
     ycp = np.array([-25, -25, -27.69, -21.61, -14.38, -7.20, 0])
-    traj = Bernstein(np.append(xcp, ycp), t0, tf)
+    traj = Bernstein(np.append(xcp, ycp), t0, tf).cpts.reshape([dim,n])
+    range_meas = []
     
-    for i in n:
-        range_meas = np.linalg.norm(traj.cpts[i] - x_star)
+    for i in range(n):
+        range_meas.append(np.linalg.norm(traj[:,i] - x_star))
         
-    x_est = observer(x0, range_meas, traj.cpts, n)
+    x_est = observer(x0, range_meas, traj, n)
     
     
