@@ -1,0 +1,45 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Jul 27 20:40:48 2022
+
+@author: camillatabasso
+"""
+
+import numpy as np
+from polynomial.bernstein import Bernstein
+from statsmodels.distributions.empirical_distribution import ECDF
+    
+    
+def bernsteinEstimator(estimate, dim, a, b):
+    
+    #Project data
+    s = estimate.shape[0]
+    est_scaled = np.zeros((s,dim))
+    for i in range(s):
+        est_scaled[i,:] = np.divide(estimate[i,:] - a, b - a)
+    
+    # Find probabilities for x and y
+    ecdf = ECDF(est_scaled[:,0])
+    Fx = ecdf.y
+    x_cdf = ecdf.x
+    
+    ecdf = ECDF(est_scaled[:,1])
+    Fy = ecdf.y
+    y_cdf = ecdf.x
+    
+    # Create BP to approximate CDF
+    x = y = np.linspace(0, 1, 101)
+    
+    
+    return 
+    
+    
+        
+
+if __name__ == '__main__':
+    dim = 2
+    estimate = np.array([[0, 0], [10, 10]],ndmin=2)
+    a = np.array([[-50, -50]])
+    b = np.array([[50, 50]])
+    y = bernsteinEstimator(estimate, dim, a, b)
